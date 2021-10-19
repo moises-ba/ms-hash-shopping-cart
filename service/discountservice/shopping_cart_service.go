@@ -11,15 +11,17 @@ import (
 	pb "github.com/moises-ba/ms-hash-shopping-cart/grpc/discount"
 	"github.com/moises-ba/ms-hash-shopping-cart/model"
 	"github.com/moises-ba/ms-hash-shopping-cart/repository"
+	"github.com/moises-ba/ms-hash-shopping-cart/service/holidayservice"
 	"github.com/moises-ba/ms-hash-shopping-cart/utils"
 )
 
-func NewDiscountService(pRepo repository.ShoppingCartRepositoryIf) DiscountServiceIf {
-	return &discountService{repo: pRepo}
+func NewDiscountService(pHolidayservice holidayservice.HolidayServiceIf, pRepo repository.ShoppingCartRepositoryIf) DiscountServiceIf {
+	return &discountService{repo: pRepo, holidayservice: pHolidayservice}
 }
 
 type discountService struct {
-	repo repository.ShoppingCartRepositoryIf
+	holidayservice holidayservice.HolidayServiceIf
+	repo           repository.ShoppingCartRepositoryIf
 }
 
 func (s *discountService) FindDiscount(p *model.Product) (float32, error) {
@@ -79,13 +81,7 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 		return err
 	}
 
-	dtBlackFriday, err := s.repo.FindBlackFridayDay()
-	if err != nil {
-		log.Println(err)
-	}
-	dtNow := time.Now()
-
-	if dtBlackFriday.Day() == dtNow.Day() && dtBlackFriday.Month() == dtNow.Month() { //eh blackfriday?
+	if s.holidayservice.IsTodayBlackFriday() {
 		gifts := s.repo.FindGifts()
 		if len(gifts) > 0 {
 			ramdomGift := gifts[rand.Intn(len(gifts)+1)]

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"sync"
-	"time"
 
 	"github.com/moises-ba/ms-hash-shopping-cart/model"
 	"github.com/moises-ba/ms-hash-shopping-cart/utils"
@@ -103,12 +102,6 @@ func (r *shoppingCartMemoryRepository) AddGiftToCart(user *model.User, itemProdu
 	}
 
 	return nil
-}
-
-//como estamos usando um repositorio em memoria, retornamos de maneira fixa a data, deveria ser oriundo de uma base de feriados
-func (r *shoppingCartMemoryRepository) FindBlackFridayDay() (time.Time, error) {
-	layout := "02-01-2006"
-	return time.Parse(layout, "26-11-2021")
 }
 
 func (r *shoppingCartMemoryRepository) ResumeCart(user *model.User) *model.CartResume {

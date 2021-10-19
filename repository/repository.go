@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"time"
-
 	"github.com/moises-ba/ms-hash-shopping-cart/model"
 )
 
@@ -13,6 +11,5 @@ type ShoppingCartRepositoryIf interface {
 	AddToCart(user *model.User, itemProduct *model.ItemProduct) error
 	AddGiftToCart(user *model.User, itemProduct *model.ItemProduct, canAddGift func(itensProducts []*model.ItemProduct) bool) error
 	ResumeCart(user *model.User) *model.CartResume
-	FindBlackFridayDay() (time.Time, error)
 	EmptyCart(user *model.User)
 }
