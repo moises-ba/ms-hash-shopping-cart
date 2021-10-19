@@ -63,11 +63,13 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 		discountProduct = 0
 	}
 
+	log.Println("Desconto concedido: ", discountProduct)
+
 	itemProduct.Discount = discountProduct
 
 	totalAmountItem := itemProduct.UnitAmount * itemProduct.Quantity //total dos produtos somados
 	//calculando o desconto no valor total das somas dos itens
-	itemProduct.TotalAmount = totalAmountItem - (totalAmountItem * (int32(discountProduct) / 100))
+	itemProduct.TotalAmount = int32(float32(totalAmountItem) - (float32(totalAmountItem) * (discountProduct / 100.0)))
 
 	//se o cliente escolheu comprar um presente ele deixa de ser presente
 	itemProduct.IsGift = false

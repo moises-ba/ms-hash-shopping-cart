@@ -120,8 +120,8 @@ func (r *shoppingCartMemoryRepository) ResumeCart(user *model.User) *model.CartR
 	if cartPlaceHolder != nil {
 
 		for _, p := range cartPlaceHolder.products {
-			resumeCart.TotalAmount += p.UnitAmount * p.Quantity
-			resumeCart.TotalDiscount += int32(p.Discount * float32(p.Quantity)) //ainda nao olhei a API para saber se o desconto chega como float
+			resumeCart.TotalAmount += p.TotalAmount
+			resumeCart.TotalDiscount += (p.UnitAmount - p.TotalAmount)
 			resumeCart.Products = append(resumeCart.Products, &model.ItemProduct{
 				BaseProduct: p.BaseProduct,
 				UnitAmount:  p.UnitAmount,

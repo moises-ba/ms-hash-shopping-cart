@@ -5,7 +5,7 @@
 
 
 imagem docker do desconto:
-  docker run -p 50051:50051 hashorg/hash-mock-discount-service
+  docker run -d -p 50051:50051 hashorg/hash-mock-discount-service
 
 
 
