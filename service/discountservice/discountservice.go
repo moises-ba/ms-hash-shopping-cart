@@ -7,4 +7,5 @@ type DiscountServiceIf interface {
 	FindAllProducts() []*model.Product
 	AddToCart(user *model.User, itemProduct *model.ItemProduct) error
 	ResumeCart(user *model.User) *model.CartResume
+	EmptyCart(user *model.User)
 }

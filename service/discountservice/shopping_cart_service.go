@@ -112,5 +112,15 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 }
 
 func (s *discountService) ResumeCart(user *model.User) *model.CartResume {
-	return s.repo.ResumeCart(user)
+
+	cartResume := s.repo.ResumeCart(user)
+
+	//VERIFICAR SE DEVEMOS APAGAR O CARRINHO DE COMPRAS
+	s.EmptyCart(user)
+
+	return cartResume
+}
+
+func (s *discountService) EmptyCart(user *model.User) {
+	s.repo.EmptyCart(user)
 }

@@ -14,4 +14,5 @@ type ShoppingCartRepositoryIf interface {
 	AddGiftToCart(user *model.User, itemProduct *model.ItemProduct, canAddGift func(itensProducts []*model.ItemProduct) bool) error
 	ResumeCart(user *model.User) *model.CartResume
 	FindBlackFridayDay() (time.Time, error)
+	EmptyCart(user *model.User)
 }

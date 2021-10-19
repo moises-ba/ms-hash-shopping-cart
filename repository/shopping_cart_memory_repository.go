@@ -135,6 +135,10 @@ func (r *shoppingCartMemoryRepository) ResumeCart(user *model.User) *model.CartR
 	return resumeCart
 }
 
+func (r *shoppingCartMemoryRepository) EmptyCart(user *model.User) {
+	delete(cart, user.Id)
+}
+
 func NewShoppingCartMemoryRepository() ShoppingCartRepositoryIf {
 	return &shoppingCartMemoryRepository{}
 }
