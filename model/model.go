@@ -5,19 +5,24 @@ type User struct {
 	Name string `json:"name"`
 }
 
-type Product struct {
+type BaseProduct struct { //criado um produto base pois o campo valor no produto data_source é 'Amount' e no ItemProduct é 'unit_amount'
 	Id          int32  `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	UnitAmount  int32  `json:"unit_amount"`
 	IsGift      bool   `json:"is_gift"`
 }
 
+type Product struct {
+	BaseProduct
+	Amount int32 `json:"amount"`
+}
+
 type ItemProduct struct {
-	Product
+	BaseProduct
 	Quantity    int32   `json:"quantity"`
 	TotalAmount int32   `json:"total_amount"`
 	Discount    float32 `json:"discount"`
+	UnitAmount  int32   `json:"unit_amount"`
 }
 
 type CartResume struct {

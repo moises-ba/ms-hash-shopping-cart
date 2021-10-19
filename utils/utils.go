@@ -10,7 +10,7 @@ import (
 func ConnectGRPCEndPoint(addr string) (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 
-	opts = append(opts, grpc.WithBlock())
+	opts = append(opts, grpc.WithInsecure())
 	conn, err := grpc.Dial(addr, opts...)
 	if err != nil {
 		log.Println(err)

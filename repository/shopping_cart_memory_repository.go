@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"sync"
 	"time"
 
@@ -22,7 +21,7 @@ type productListHolder struct {
 
 func (ph *productListHolder) Add(pItemProduct *model.ItemProduct) {
 	if ph.products == nil {
-		ph.products = make([]*model.ItemProduct, 1)
+		ph.products = make([]*model.ItemProduct, 0)
 	}
 	ph.products = append(ph.products, pItemProduct)
 }
@@ -69,11 +68,6 @@ func (r *shoppingCartMemoryRepository) FindGifts() []*model.Product {
 
 func (r *shoppingCartMemoryRepository) AddToCart(user *model.User, itemProduct *model.ItemProduct) error {
 
-	productFromDataSource := r.FindProducById(itemProduct.Id)
-	if productFromDataSource == nil {
-		return errors.New("Produto não encontrado.")
-	}
-
 	listProductHolder := cart[user.Id]
 
 	if listProductHolder == nil {
@@ -114,18 +108,27 @@ func (r *shoppingCartMemoryRepository) AddGiftToCart(user *model.User, itemProdu
 //como estamos usando um repositorio em memoria, retornamos de maneira fixa a data, deveria ser oriundo de uma base de feriados
 func (r *shoppingCartMemoryRepository) FindBlackFridayDay() (time.Time, error) {
 	layout := "02-01-2006"
-	return time.Parse(layout, "26-11-20")
+	return time.Parse(layout, "26-11-2021")
 }
 
 func (r *shoppingCartMemoryRepository) ResumeCart(user *model.User) *model.CartResume {
 
-	resumeCart := &model.CartResume{TotalAmount: 0, TotalDiscount: 0, TotalAmountWithDiscount: 0, Products: make([]*model.ItemProduct, 10)}
+	resumeCart := &model.CartResume{TotalAmount: 0, TotalDiscount: 0, TotalAmountWithDiscount: 0, Products: make([]*model.ItemProduct, 0)}
 
 	cartPlaceHolder := cart[user.Id]
+
 	if cartPlaceHolder != nil {
+
 		for _, p := range cartPlaceHolder.products {
 			resumeCart.TotalAmount += p.UnitAmount * p.Quantity
 			resumeCart.TotalDiscount += int32(p.Discount * float32(p.Quantity)) //ainda nao olhei a API para saber se o desconto chega como float
+			resumeCart.Products = append(resumeCart.Products, &model.ItemProduct{
+				BaseProduct: p.BaseProduct,
+				UnitAmount:  p.UnitAmount,
+				Quantity:    p.Quantity,
+				Discount:    p.Discount,
+				TotalAmount: p.TotalAmount,
+			})
 		}
 	}
 

@@ -5,4 +5,11 @@
 
 
 imagem docker do desconto:
-  docker run -p 50051:50051 hashorg/hash-mock-discount-servic
+  docker run -p 50051:50051 hashorg/hash-mock-discount-service
+
+
+
+
+post:
+curl -X POST http://localhost:8080/checkout -H 'Content-Type: application/json' -d '{"products": [{"id": 1,"quantity": 1}]}'
+

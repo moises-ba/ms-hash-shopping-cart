@@ -2,6 +2,7 @@ package discountservice
 
 import (
 	"context"
+	"errors"
 	"log"
 	"math/rand"
 	"time"
@@ -49,7 +50,14 @@ func (s *discountService) FindAllProducts() []*model.Product {
 
 func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemProduct) error {
 
-	discountProduct, err := s.FindDiscount(&itemProduct.Product)
+	productFromDataSource := s.repo.FindProducById(itemProduct.Id) //obtendo o produto na base de dados
+	if productFromDataSource == nil {
+		return errors.New("produto não encontrado")
+	}
+	itemProduct.BaseProduct = productFromDataSource.BaseProduct
+	itemProduct.UnitAmount = productFromDataSource.Amount
+
+	discountProduct, err := s.FindDiscount(productFromDataSource)
 	if err != nil {
 		log.Println("Falha na chamada da api de descontos.", err)
 		discountProduct = 0
@@ -71,7 +79,7 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 
 	dtBlackFriday, err := s.repo.FindBlackFridayDay()
 	if err != nil {
-		return err
+		log.Println(err)
 	}
 	dtNow := time.Now()
 
@@ -80,7 +88,7 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 		if len(gifts) > 0 {
 			ramdomGift := gifts[rand.Intn(len(gifts)+1)]
 			s.repo.AddGiftToCart(user, &model.ItemProduct{ //adiciona o presente
-				Product:     *ramdomGift,
+				BaseProduct: ramdomGift.BaseProduct,
 				TotalAmount: 0,
 				Discount:    0,
 				Quantity:    1,

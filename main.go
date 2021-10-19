@@ -16,7 +16,7 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/products", controller.ListProducts())
-	router.GET("/checkout", controller.Checkout())
+	router.POST("/checkout", controller.Checkout())
 
 	router.Run("localhost:8080")
 

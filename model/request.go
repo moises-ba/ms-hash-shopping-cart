@@ -6,5 +6,5 @@ type ProductItemRequest struct {
 }
 
 type ProductsRequest struct {
-	Products []*ProductItemRequest `json:"poducts"`
+	Products []*ProductItemRequest `json:"products"`
 }
