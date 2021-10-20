@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/moises-ba/ms-hash-shopping-cart/config"
@@ -54,7 +55,7 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 
 	productFromDataSource := s.repo.FindProducById(itemProduct.Id) //obtendo o produto na base de dados
 	if productFromDataSource == nil {
-		return errors.New("produto não encontrado")
+		return errors.New("produto não encontrado: " + strconv.Itoa(int(itemProduct.Id)))
 	}
 	itemProduct.BaseProduct = productFromDataSource.BaseProduct
 	itemProduct.UnitAmount = productFromDataSource.Amount
