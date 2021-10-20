@@ -1,0 +1,16 @@
+version: '2'
+services:
+  hash-mock-discount-service:
+    image: hashorg/hash-mock-discount-service
+    restart: always
+    ports:
+      - 50051:50051  
+    
+  ms-hash-shopping-cart:
+    image: moisesba/ms-hash-shopping-cart
+    restart: always
+    ports:
+      - 8080:8080    
+    environment:
+      MS_DISCOUNT_URL: hash-mock-discount-service:50051
+   

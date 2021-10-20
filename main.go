@@ -30,6 +30,6 @@ func main() {
 	router.GET("/products", controller.ListProducts())
 	router.POST("/checkout", controller.Checkout())
 
-	router.Run("localhost:8080")
+	router.Run(":8080")
 
 }
