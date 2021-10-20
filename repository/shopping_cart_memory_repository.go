@@ -114,7 +114,7 @@ func (r *shoppingCartMemoryRepository) ResumeCart(user *model.User) *model.CartR
 
 		for _, p := range cartPlaceHolder.products {
 			resumeCart.TotalAmount += p.TotalAmount
-			resumeCart.TotalDiscount += (p.UnitAmount - p.TotalAmount)
+			resumeCart.TotalDiscount += ((p.UnitAmount * p.Quantity) - p.TotalAmount)
 			resumeCart.Products = append(resumeCart.Products, &model.ItemProduct{
 				BaseProduct: p.BaseProduct,
 				UnitAmount:  p.UnitAmount,

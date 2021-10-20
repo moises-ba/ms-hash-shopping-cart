@@ -8,9 +8,19 @@ import (
 	"github.com/moises-ba/ms-hash-shopping-cart/service/holidayservice"
 )
 
+type holidayServiceMock struct {
+}
+
+func (h *holidayServiceMock) IsTodayBlackFriday() bool {
+	return true
+}
+
 func main() {
 
 	holidayservice := holidayservice.NewHolidayService()
+
+	holidayservice = &holidayServiceMock{}
+
 	repo := repository.NewShoppingCartMemoryRepository()
 	service := discountservice.NewDiscountService(holidayservice, repo)
 

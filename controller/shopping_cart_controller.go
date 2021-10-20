@@ -55,7 +55,11 @@ func (controller *shoppingCartController) Checkout() func(c *gin.Context) {
 				}
 			}
 
-			c.IndentedJSON(http.StatusOK, controller.service.ResumeCart(usuarioSimulado))
+			cartResume := controller.service.ResumeCart(usuarioSimulado)
+			//VERIFICAR SE DEVEMOS APAGAR O CARRINHO DE COMPRAS
+			controller.service.EmptyCart(usuarioSimulado)
+
+			c.IndentedJSON(http.StatusOK, cartResume)
 
 		}
 	}

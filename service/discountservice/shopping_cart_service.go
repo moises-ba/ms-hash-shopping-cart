@@ -84,7 +84,7 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 	if s.holidayservice.IsTodayBlackFriday() {
 		gifts := s.repo.FindGifts()
 		if len(gifts) > 0 {
-			ramdomGift := gifts[rand.Intn(len(gifts)+1)]
+			ramdomGift := gifts[rand.Intn(len(gifts))]
 			s.repo.AddGiftToCart(user, &model.ItemProduct{ //adiciona o presente
 				BaseProduct: ramdomGift.BaseProduct,
 				TotalAmount: 0,
@@ -99,7 +99,7 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 						return false
 					}
 				}
-				return false
+				return true
 			})
 		}
 	}
@@ -110,9 +110,6 @@ func (s *discountService) AddToCart(user *model.User, itemProduct *model.ItemPro
 func (s *discountService) ResumeCart(user *model.User) *model.CartResume {
 
 	cartResume := s.repo.ResumeCart(user)
-
-	//VERIFICAR SE DEVEMOS APAGAR O CARRINHO DE COMPRAS
-	s.EmptyCart(user)
 
 	return cartResume
 }
