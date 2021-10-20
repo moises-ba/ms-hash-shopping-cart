@@ -19,7 +19,7 @@ func main() {
 
 	holidayservice := holidayservice.NewHolidayService()
 
-	holidayservice = &holidayServiceMock{}
+	//holidayservice = &holidayServiceMock{}
 
 	repo := repository.NewShoppingCartMemoryRepository()
 	service := discountservice.NewDiscountService(holidayservice, repo)
