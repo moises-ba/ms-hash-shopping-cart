@@ -6,14 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/moises-ba/ms-hash-shopping-cart/model"
-	"github.com/moises-ba/ms-hash-shopping-cart/service/discountservice"
+	"github.com/moises-ba/ms-hash-shopping-cart/service"
 )
 
 type shoppingCartController struct {
-	service discountservice.DiscountServiceIf
+	service service.ShoppingCartServiceIf
 }
 
-func NewShoppingCartController(pService discountservice.DiscountServiceIf) ShoppingCartControllerIf {
+func NewShoppingCartController(pService service.ShoppingCartServiceIf) ShoppingCartControllerIf {
 	return &shoppingCartController{
 		service: pService,
 	}
