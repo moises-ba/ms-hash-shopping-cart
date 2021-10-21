@@ -14,9 +14,16 @@ post:
 curl -X POST http://localhost:8080/checkout -H 'Content-Type: application/json' -d '{"products": [{"id": 1,"quantity": 1}]}'
 
 
+##### RODAR OS TESTES ######
+dentro da pasta do projeto:
+go test ./...
+
+##### GERAR IMAGEM ################
 
 para gerar a imagem docker, devemos entrar no diretorio do projeto e executar
 docker build -t moisesba/ms-hash-shopping-cart .
+
+##### SUBIR PROJETO UTILIZANDO O DOCKER-COMPOSE ##########
 
 após gerar, para executar rodamos via docker-compose dentro da mesma pasta do projeto
 docker-compose up -d
