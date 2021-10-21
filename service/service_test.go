@@ -32,6 +32,7 @@ func (s *discountServiceNOK) FindDiscount(p *model.Product) (float32, error) {
 //arquvio products.json de teste colocado no caminho relativo
 var repo repository.ShoppingCartRepositoryIf = repository.NewShoppingCartMemoryRepository()
 
+///teste de busca de todos os produtos
 func TestFindAllProducts(t *testing.T) {
 
 	products := NewShoppinCartService(&holidayServiceNotBlackFriday{}, &discountServiceOK{}, repo).FindAllProducts()
@@ -44,6 +45,7 @@ func TestFindAllProducts(t *testing.T) {
 
 }
 
+//teste de busca por ID
 func TestFindById(t *testing.T) {
 
 	product := repo.FindProducById(1)
@@ -54,6 +56,7 @@ func TestFindById(t *testing.T) {
 
 }
 
+//teste de busca de presentes
 func TestFindGifts(t *testing.T) {
 
 	gifts := repo.FindGifts()
@@ -68,6 +71,7 @@ func TestFindGifts(t *testing.T) {
 
 }
 
+//teste de adição no carrinho num dia que NÂO seja blackfriday e servico de desconto fora do ar
 func TestAddToCartNotBlackFriday(t *testing.T) {
 
 	user := &model.User{Id: "fulano"}
@@ -92,6 +96,7 @@ func TestAddToCartNotBlackFriday(t *testing.T) {
 
 }
 
+//teste com compra NÃO blackfriday com servio de desconto operante
 func TestAddToCartNotBlackFridayWithDiscountActive(t *testing.T) {
 
 	user := &model.User{Id: "fulano"}
@@ -124,6 +129,7 @@ func TestAddToCartNotBlackFridayWithDiscountActive(t *testing.T) {
 
 }
 
+//teste com duas compras num dia de blackfriday e adicao automatica de um brinde apenas
 func TestAddToCartBlackFriday(t *testing.T) {
 
 	user := &model.User{Id: "fulano"}
