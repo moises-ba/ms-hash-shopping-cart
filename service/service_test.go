@@ -128,22 +128,39 @@ func TestAddToCartBlackFriday(t *testing.T) {
 
 	user := &model.User{Id: "fulano"}
 	repo.EmptyCart(user)
-	item := &model.ItemProduct{BaseProduct: model.BaseProduct{Id: 1}, Quantity: 1}
 	srv := NewShoppinCartService(&holidayServiceBlackFriday{}, &discountServiceNOK{}, repo)
 
+	item := &model.ItemProduct{BaseProduct: model.BaseProduct{Id: 1}, Quantity: 1}
 	err := srv.AddToCart(user, item)
+	if err != nil {
+		t.Fatalf(`TestAddToCartBlackFriday falha ao adicionar ao carrinho -> %v `, err.Error())
+	}
+
+	item = &model.ItemProduct{BaseProduct: model.BaseProduct{Id: 2}, Quantity: 1}
+	err = srv.AddToCart(user, item)
 	if err != nil {
 		t.Fatalf(`TestAddToCartBlackFriday falha ao adicionar ao carrinho -> %v `, err.Error())
 	}
 
 	cartResume := srv.ResumeCart(user)
 
-	if cartResume == nil || len(cartResume.Products) != 2 {
+	if cartResume == nil || len(cartResume.Products) != 3 {
 		t.Fatal("TestAddToCartBlackFriday Carrinho deveria conter 2 itens")
 	}
 
-	if cartResume.Products[0].IsGift != false || cartResume.Products[1].IsGift != true {
-		t.Fatal("TestAddToCartBlackFriday Carrinho deveria ter dois produtos, um comprado e um presente")
+	totalItens := 0
+	totalBrindes := 0
+
+	for _, item := range cartResume.Products {
+		if item.IsGift {
+			totalBrindes++
+		} else {
+			totalItens++
+		}
+	}
+
+	if totalItens != 2 || totalBrindes != 1 {
+		t.Fatal("TestAddToCartBlackFriday Carrinho deveria ter 3 produtos, 2 comprados e 1 presente")
 	}
 
 }
