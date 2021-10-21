@@ -9,7 +9,7 @@ import (
 
 //responsavel por encapsular uma lista de produtos e tratar concorrencia na insercao
 type productListHolder struct {
-	mu       *sync.Mutex
+	mu       *sync.Mutex //semaforo utilizado no addGift para bloquear a lista para evitar presentes duplicados
 	products []*model.ItemProduct
 }
 
@@ -77,7 +77,7 @@ func (r *shoppingCartMemoryRepository) AddGiftToCart(user *model.User, itemProdu
 		var productsInCart = make([]*model.ItemProduct, 0)
 		prodPlaceholder := r.cart[user.Id]
 		if prodPlaceholder != nil {
-			//locando o carrinho do usuario para checagem
+			//locando o carrinho do usuario para checagem evitando presentes duplicados
 			if prodPlaceholder.mu == nil {
 				prodPlaceholder.mu = &sync.Mutex{}
 			}
