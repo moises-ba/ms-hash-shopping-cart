@@ -15,12 +15,12 @@ func (h *holidayServiceBlackFriday) IsTodayBlackFriday() bool { return true }
 
 type holidayServiceNotBlackFriday struct{}
 
-func (h *holidayServiceNotBlackFriday) IsTodayBlackFriday() bool { return true }
+func (h *holidayServiceNotBlackFriday) IsTodayBlackFriday() bool { return false }
 
 //servico de desconto no ar
 type discountServiceOK struct{}
 
-func (s *discountServiceOK) FindDiscount(p *model.Product) (float32, error) { return 0.5, nil }
+func (s *discountServiceOK) FindDiscount(p *model.Product) (float32, error) { return 0.05, nil }
 
 //servico de desconto Fora
 type discountServiceNOK struct{}
@@ -34,7 +34,7 @@ var repo repository.ShoppingCartRepositoryIf = repository.NewShoppingCartMemoryR
 
 func TestFindAllProducts(t *testing.T) {
 
-	products := NewShoppinCartService(&holidayServiceBlackFriday{}, &discountServiceOK{}, repo).FindAllProducts()
+	products := NewShoppinCartService(&holidayServiceNotBlackFriday{}, &discountServiceOK{}, repo).FindAllProducts()
 
 	expectedTotalReg := 6
 
@@ -64,6 +64,86 @@ func TestFindGifts(t *testing.T) {
 
 	if gifts[0].IsGift == false {
 		t.Fatalf(`FindGifts retornou um registro que não é um gift`)
+	}
+
+}
+
+func TestAddToCartNotBlackFriday(t *testing.T) {
+
+	user := &model.User{Id: "fulano"}
+	repo.EmptyCart(user)
+	item := &model.ItemProduct{BaseProduct: model.BaseProduct{Id: 1}, Quantity: 1}
+	srv := NewShoppinCartService(&holidayServiceNotBlackFriday{}, &discountServiceNOK{}, repo)
+
+	err := srv.AddToCart(user, item)
+	if err != nil {
+		t.Fatalf(`TestAddToCart falha ao adicionar ao carrinho -> %v `, err.Error())
+	}
+
+	cartResume := srv.ResumeCart(user)
+
+	if cartResume == nil || len(cartResume.Products) != 1 {
+		t.Fatal("Carrinho deveria conter 1 item")
+	}
+
+	if cartResume.Products[0].Id != 1 {
+		t.Fatal("Id do produto  no carrinho deveria ser 1 ")
+	}
+
+}
+
+func TestAddToCartNotBlackFridayWithDiscountActive(t *testing.T) {
+
+	user := &model.User{Id: "fulano"}
+	repo.EmptyCart(user)
+	item := &model.ItemProduct{BaseProduct: model.BaseProduct{Id: 1}, Quantity: 1}
+	srv := NewShoppinCartService(&holidayServiceNotBlackFriday{}, &discountServiceOK{}, repo)
+
+	err := srv.AddToCart(user, item)
+	if err != nil {
+		t.Fatalf(`TestAddToCartNotBlackFridayWithDiscountActive falha ao adicionar ao carrinho -> %v `, err.Error())
+	}
+
+	cartResume := srv.ResumeCart(user)
+
+	if cartResume == nil || len(cartResume.Products) != 1 {
+		t.Fatal("TestAddToCartNotBlackFridayWithDiscountActive Carrinho deveria conter 1 item")
+	}
+
+	unitAmountExpected := int32(15157)
+	totalAmountExpected := int32(15149)
+	totalDiscountExpected := int32(8)
+
+	if cartResume.Products[0].UnitAmount != unitAmountExpected ||
+		cartResume.Products[0].TotalAmount != totalAmountExpected ||
+		cartResume.TotalDiscount != totalDiscountExpected {
+
+		t.Fatalf(`TestAddToCartNotBlackFridayWithDiscountActive Valores esperados UnitAmount %v, TotalAmount %v, TotalDiscount %v `,
+			unitAmountExpected, totalAmountExpected, totalDiscountExpected)
+	}
+
+}
+
+func TestAddToCartBlackFriday(t *testing.T) {
+
+	user := &model.User{Id: "fulano"}
+	repo.EmptyCart(user)
+	item := &model.ItemProduct{BaseProduct: model.BaseProduct{Id: 1}, Quantity: 1}
+	srv := NewShoppinCartService(&holidayServiceBlackFriday{}, &discountServiceNOK{}, repo)
+
+	err := srv.AddToCart(user, item)
+	if err != nil {
+		t.Fatalf(`TestAddToCartBlackFriday falha ao adicionar ao carrinho -> %v `, err.Error())
+	}
+
+	cartResume := srv.ResumeCart(user)
+
+	if cartResume == nil || len(cartResume.Products) != 2 {
+		t.Fatal("TestAddToCartBlackFriday Carrinho deveria conter 2 itens")
+	}
+
+	if cartResume.Products[0].IsGift != false || cartResume.Products[1].IsGift != true {
+		t.Fatal("TestAddToCartBlackFriday Carrinho deveria ter dois produtos, um comprado e um presente")
 	}
 
 }

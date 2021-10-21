@@ -11,13 +11,13 @@ import (
 )
 
 func NewShoppinCartService(pHolidayservice HolidayServiceIf, pDiscountService DiscountServiceIf, pRepo repository.ShoppingCartRepositoryIf) ShoppingCartServiceIf {
-	return &shoppingCartService{repo: pRepo, holidayservice: pHolidayservice}
+	return &shoppingCartService{repo: pRepo, discountService: pDiscountService, holidayservice: pHolidayservice}
 }
 
 type shoppingCartService struct {
-	holidayservice   HolidayServiceIf
-	pDiscountService DiscountServiceIf
-	repo             repository.ShoppingCartRepositoryIf
+	holidayservice  HolidayServiceIf
+	discountService DiscountServiceIf
+	repo            repository.ShoppingCartRepositoryIf
 }
 
 func (s *shoppingCartService) FindAllProducts() []*model.Product {
@@ -33,7 +33,7 @@ func (s *shoppingCartService) AddToCart(user *model.User, itemProduct *model.Ite
 	itemProduct.BaseProduct = productFromDataSource.BaseProduct
 	itemProduct.UnitAmount = productFromDataSource.Amount
 
-	discountProduct, err := s.pDiscountService.FindDiscount(productFromDataSource)
+	discountProduct, err := s.discountService.FindDiscount(productFromDataSource)
 	if err != nil {
 		log.Println("Falha na chamada da api de descontos.", err)
 		discountProduct = 0
@@ -65,6 +65,7 @@ func (s *shoppingCartService) AddToCart(user *model.User, itemProduct *model.Ite
 				Discount:    0,
 				Quantity:    1,
 			}, func(itensInCart []*model.ItemProduct) bool { //lambda q o repositorio utilizara para verificar se pode inserir ou nao um presente
+
 				if len(itensInCart) == 0 { // o carrinho nao pode estar vazio
 					return false
 				}
