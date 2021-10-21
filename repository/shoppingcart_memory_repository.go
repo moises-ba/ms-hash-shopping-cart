@@ -7,11 +7,6 @@ import (
 	"github.com/moises-ba/ms-hash-shopping-cart/utils"
 )
 
-var (
-	products []*model.Product              //lista de produtos
-	cart     map[string]*productListHolder //map que contem o carrinho de usuarios
-)
-
 //responsavel por encapsular uma lista de produtos e tratar concorrencia na insercao
 type productListHolder struct {
 	mu       *sync.Mutex
@@ -25,17 +20,15 @@ func (ph *productListHolder) Add(pItemProduct *model.ItemProduct) {
 	ph.products = append(ph.products, pItemProduct)
 }
 
-func init() { //inicia as fontes de dados
-	products = utils.ReadJSONProducts()
-	cart = make(map[string]*productListHolder)
+type shoppingCartMemoryRepository struct {
+	products []*model.Product              //lista de produtos
+	cart     map[string]*productListHolder //map que contem o carrinho de usuarios
 }
-
-type shoppingCartMemoryRepository struct{}
 
 func (r *shoppingCartMemoryRepository) FindAllProducts() []*model.Product {
 	lProducts := make([]*model.Product, 0)
 
-	lProducts = append(lProducts, products...)
+	lProducts = append(lProducts, r.products...)
 
 	return lProducts
 }
@@ -43,7 +36,7 @@ func (r *shoppingCartMemoryRepository) FindAllProducts() []*model.Product {
 func (r *shoppingCartMemoryRepository) FindProducById(id int32) *model.Product {
 	var lProduct *model.Product = nil
 
-	for _, p := range products {
+	for _, p := range r.products {
 		if p.Id == id {
 			lProduct = p
 			break
@@ -56,7 +49,7 @@ func (r *shoppingCartMemoryRepository) FindProducById(id int32) *model.Product {
 func (r *shoppingCartMemoryRepository) FindGifts() []*model.Product {
 	var lProducts []*model.Product = make([]*model.Product, 0)
 
-	for _, p := range products {
+	for _, p := range r.products {
 		if p.IsGift {
 			lProducts = append(lProducts, p)
 		}
@@ -67,11 +60,11 @@ func (r *shoppingCartMemoryRepository) FindGifts() []*model.Product {
 
 func (r *shoppingCartMemoryRepository) AddToCart(user *model.User, itemProduct *model.ItemProduct) error {
 
-	listProductHolder := cart[user.Id]
+	listProductHolder := r.cart[user.Id]
 
 	if listProductHolder == nil {
 		listProductHolder = &productListHolder{products: make([]*model.ItemProduct, 0)}
-		cart[user.Id] = listProductHolder
+		r.cart[user.Id] = listProductHolder
 	}
 	listProductHolder.Add(itemProduct)
 
@@ -82,7 +75,7 @@ func (r *shoppingCartMemoryRepository) AddGiftToCart(user *model.User, itemProdu
 	if itemProduct.IsGift {
 
 		var productsInCart = make([]*model.ItemProduct, 0)
-		prodPlaceholder := cart[user.Id]
+		prodPlaceholder := r.cart[user.Id]
 		if prodPlaceholder != nil {
 			//locando o carrinho do usuario para checagem
 			if prodPlaceholder.mu == nil {
@@ -108,7 +101,7 @@ func (r *shoppingCartMemoryRepository) ResumeCart(user *model.User) *model.CartR
 
 	resumeCart := &model.CartResume{TotalAmount: 0, TotalDiscount: 0, TotalAmountWithDiscount: 0, Products: make([]*model.ItemProduct, 0)}
 
-	cartPlaceHolder := cart[user.Id]
+	cartPlaceHolder := r.cart[user.Id]
 
 	if cartPlaceHolder != nil {
 
@@ -129,9 +122,12 @@ func (r *shoppingCartMemoryRepository) ResumeCart(user *model.User) *model.CartR
 }
 
 func (r *shoppingCartMemoryRepository) EmptyCart(user *model.User) {
-	delete(cart, user.Id)
+	delete(r.cart, user.Id)
 }
 
 func NewShoppingCartMemoryRepository() ShoppingCartRepositoryIf {
-	return &shoppingCartMemoryRepository{}
+	return &shoppingCartMemoryRepository{
+		products: utils.ReadJSONProducts(),
+		cart:     make(map[string]*productListHolder),
+	}
 }
