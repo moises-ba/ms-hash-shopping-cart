@@ -20,9 +20,10 @@ func (h *holidayService) IsTodayBlackFriday() bool {
 	if err != nil {
 		log.Println(err)
 	}
-	dtNow := time.Now()
+	dtBlackFriday = dtBlackFriday.Truncate(24 * time.Hour)
+	dtNow := time.Now().Truncate(24 * time.Hour)
 
-	return dtBlackFriday.Day() == dtNow.Day() && dtBlackFriday.Month() == dtNow.Month()
+	return dtNow.Equal(dtBlackFriday)
 }
 
 //como estamos usando um repositorio em memoria, retornamos de maneira fixa a data, deveria ser oriundo de uma base de feriados
